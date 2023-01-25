@@ -1,0 +1,17 @@
+{
+    "name": "stude/php_gb_project",
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Vladislav Redin",
+            "email": "studentredin323@gmail.com"
+        }
+    ],
+    "require": {
+        "fakerphp/faker": "^1.21"
+    }
+}
