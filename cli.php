@@ -34,7 +34,7 @@ $user2 = $usersRepository->get(new UUID('6e6b22bc-5ea1-4cda-b7fd-88a55ffc18ee'))
 try {
 
     //Обработка команды создания пользователя через терминал
-    // $command->handle(Arguments::fromArgv($argv));
+    $command->handle(Arguments::fromArgv($argv));
 
     //Создание поста
     // $post = new Post(UUID::random(), $user, 'Заголовок', 'Текст поста');

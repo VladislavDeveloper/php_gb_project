@@ -1,6 +1,7 @@
 <?php
 
 namespace Blog\Commands;
+use Blog\Exceptions\ArgumentsException;
 use Blog\Exceptions\InvalidArgumentException;
 
 final class Arguments
@@ -25,12 +26,12 @@ final class Arguments
     {
         $arguments = [];
 
-        foreach($argv as $argument){
+        foreach ($argv as $argument) {
             $parts = explode('=', $argument);
             if(count($parts) !== 2){
                 continue;
             }
-            $arguments[$parts[0] = $parts[1]];
+            $arguments[$parts[0]] = $parts[1];
         }
 
         return new self($arguments);
@@ -39,7 +40,7 @@ final class Arguments
     public function get(string $argument): string
     {
         if(!array_key_exists($argument, $this->arguments)){
-            throw new InvalidArgumentException(
+            throw new ArgumentsException(
                 "No such argument: $argument"
             );
         }

@@ -3,6 +3,7 @@
 namespace Blog\Commands;
 
 use Blog\Exceptions\CommandException;
+use Blog\Exceptions\UserNotFoundException;
 use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 use Blog\User\User;
 use Blog\UUID\UUID;
@@ -27,7 +28,7 @@ class CreateUserCommand
             new User(
                 UUID::random(),
                 new Name($arguments->get('first_name'), $arguments->get('last_name')),
-                $username
+                (string) $username
             )
         );
     }
