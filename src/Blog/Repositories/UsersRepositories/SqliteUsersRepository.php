@@ -63,7 +63,7 @@ class SqliteUsersRepository implements UsersRepositoryInterface
 
         if(false === $result){
             throw new UserNotFoundException(
-                "Cannot get user: $errorString",
+                "Cannot get user: $errorString !",
             );
         }
 
@@ -73,5 +73,4 @@ class SqliteUsersRepository implements UsersRepositoryInterface
             $result['username']
         );
     }
-
 }

@@ -2,6 +2,7 @@
 
 namespace Blog\Repositories\PostsRepositories;
 
+use Blog\Exceptions\PostNotFoundException;
 use Blog\Post\Post;
 use Blog\Repositories\UsersRepositories\SqliteUsersRepository;
 use Blog\UUID\UUID;
@@ -46,6 +47,12 @@ class SqlitePostsRepository implements PostsRepositoryInterface
     private function getPost(PDOStatement $statement, $uuid): Post
     {
         $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        if($result === false){
+            throw new PostNotFoundException(
+                'Cannot find post: $uuid'
+            );
+        }
 
         $userRepository = new SqliteUsersRepository($this->connection);
 

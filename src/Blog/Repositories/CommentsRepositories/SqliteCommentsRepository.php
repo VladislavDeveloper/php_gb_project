@@ -2,6 +2,7 @@
 
 namespace Blog\Repositories\CommentsRepositories;
 use Blog\Comment\Comment;
+use Blog\Exceptions\CommentNotFoundException;
 use Blog\Repositories\PostsRepositories\SqlitePostsRepository;
 use Blog\Repositories\UsersRepositories\SqliteUsersRepository;
 use Blog\UUID\UUID;
@@ -23,9 +24,9 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
         );
 
         $statement->execute([
-            ':uuid' => $comment->getUuid(),
-            ':post_uuid' => $comment->getPost()->getUuid(),
-            ':author_uuid' => $comment->getAuthor()->uuid(),
+            ':uuid' => (string) $comment->getUuid(),
+            ':post_uuid' => (string) $comment->getPost()->getUuid(),
+            ':author_uuid' => (string) $comment->getAuthor()->uuid(),
             ':text' => $comment->getText(),
         ]);
     }
@@ -40,6 +41,12 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
         ]);
 
         $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        if($result == false){
+            throw new CommentNotFoundException(
+                'Comment not found'
+            );
+        }
 
         $postsRepository = new SqlitePostsRepository($this->connection);
 
