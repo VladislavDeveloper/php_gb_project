@@ -1,11 +1,12 @@
 <?php
 
-namespace Blog\Container;
+namespace Blog\Exceptions;
+
 use Blog\Exceptions\AppException;
 use Exception;
 use Psr\Container\NotFoundExceptionInterface;
 
-class NotFoundException extends AppException implements NotFoundExceptionInterface
+class NotFoundException extends Exception implements NotFoundExceptionInterface
 {
     
 }

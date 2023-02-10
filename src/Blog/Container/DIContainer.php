@@ -1,6 +1,7 @@
 <?php
 
 namespace Blog\Container;
+use Blog\Exceptions\NotFoundException;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 

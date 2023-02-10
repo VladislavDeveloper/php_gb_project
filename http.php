@@ -1,5 +1,6 @@
 <?php
 use Blog\Actions\Comments\AddComment;
+use Blog\Actions\Likes\AddLikeToPost;
 use Blog\Actions\Posts\CreatePost;
 use Blog\Actions\Posts\DropPost;
 use Blog\Actions\Posts\FindByUuid;
@@ -39,6 +40,7 @@ $routes = [
     'POST' => [
         '/posts/create' => CreatePost::class,
         '/comments/add' => AddComment::class,
+        '/posts/like/add' => AddLikeToPost::class
     ],
     'DELETE' => [
         '/posts/drop' => DropPost::class,
