@@ -11,7 +11,7 @@ use Blog\Http\Response;
 use Blog\Http\SuccessfulResponse;
 use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 
-class FindByUsername
+class FindByUsername implements ActionInterface
 {
     public function __construct(
         private UsersRepositoryInterface $usersRepository

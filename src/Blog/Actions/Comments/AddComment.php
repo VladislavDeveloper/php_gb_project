@@ -1,6 +1,7 @@
 <?php
 
 namespace Blog\Actions\Comments;
+use Blog\Actions\ActionInterface;
 use Blog\Exceptions\HttpException;
 use Blog\Exceptions\PostNotFoundException;
 use Blog\Exceptions\UserNotFoundException;
@@ -14,7 +15,7 @@ use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 use Blog\UUID\UUID;
 use InvalidArgumentException;
 
-class AddComment
+class AddComment implements ActionInterface
 {
     public function __construct(
         private CommentsRepositoryInterface $commentsRepository,

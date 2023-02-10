@@ -5,6 +5,11 @@
             "": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+        "Blog\\UnitTests\\Container\\": "tests/"
+        }
+    },    
     "authors": [
         {
             "name": "Vladislav Redin",
@@ -12,7 +17,8 @@
         }
     ],
     "require": {
-        "symfony/polyfill-uuid": "^1.27"
+        "symfony/polyfill-uuid": "^1.27",
+        "psr/container": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",

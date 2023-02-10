@@ -1,5 +1,5 @@
 <?php
-namespace Blog\Repositories\UsersRepository;
+namespace Blog\Repositories\UsersRepositories;
 
 use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 use Blog\User\User;
