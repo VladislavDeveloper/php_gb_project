@@ -2,6 +2,8 @@
 use Blog\Container\DIContainer;
 use Blog\Repositories\CommentsRepositories\CommentsRepositoryInterface;
 use Blog\Repositories\CommentsRepositories\SqliteCommentsRepository;
+use Blog\Repositories\LikesRepository\LikesRepositoryInterface;
+use Blog\Repositories\LikesRepository\SqliteLikesRepository;
 use Blog\Repositories\PostsRepositories\PostsRepositoryInterface;
 use Blog\Repositories\PostsRepositories\SqlitePostsRepository;
 use Blog\Repositories\UsersRepositories\SqliteUsersRepository;
@@ -38,6 +40,12 @@ $container->bind(
 $container->bind(
     CommentsRepositoryInterface::class,
     SqliteCommentsRepository::class
+);
+
+//Репозиторий лайков
+$container->bind(
+    LikesRepositoryInterface::class,
+    SqliteLikesRepository::class
 );
 
 //Возвращаем объект контейнера

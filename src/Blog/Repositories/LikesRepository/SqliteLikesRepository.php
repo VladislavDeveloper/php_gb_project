@@ -19,7 +19,7 @@ class SqliteLikesRepository implements LikesRepositoryInterface
     {
         $statement = $this->connection->prepare(
             'INSERT INTO likes (uuid, post_uuid, author_uuid)
-            VALUES (:uuid, :post, author_uuid)'
+            VALUES (:uuid, :post_uuid, :author_uuid)'
         );
 
         $statement->execute([
