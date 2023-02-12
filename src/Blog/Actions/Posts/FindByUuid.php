@@ -10,33 +10,32 @@ use Blog\Http\Response;
 use Blog\Http\SuccessfulResponse;
 use Blog\Repositories\PostsRepositories\PostsRepositoryInterface;
 use Blog\UUID\UUID;
-use InvalidArgumentException;
 
-class DropPost implements ActionInterface
+class FindByUuid implements ActionInterface
 {
     public function __construct(
         private PostsRepositoryInterface $postsRepository
-    ){
+    ) {
     }
-
-    public function handle(Request $requset): Response
+    
+    public function handle(Request $request): Response
     {
-        try{
-            $uuid = new UUID($requset->query('uuid'));
-        }catch(HttpException | InvalidArgumentException $error){
+        try {
+            $postUuid = $request->query('post_uuid');
+        } catch (HttpException $error) {
             return new ErrorResponse($error->getMessage());
         }
 
-        try{
-            $post = $this->postsRepository->get($uuid);
-        }catch(PostNotFoundException $error){
+        try {
+            $post = $this->postsRepository->get(new UUID($postUuid));
+        } catch (PostNotFoundException $error) {
             return new ErrorResponse($error->getMessage());
         }
-
-        $this->postsRepository->deletePost($uuid);
 
         return new SuccessfulResponse([
-            'message' => 'Post deleted sccessfully'
+            'title' => $post->getTitle(),
+            'text' => $post->getText(),
+            'author' => $post->getUser()->__toString()
         ]);
     }
 }

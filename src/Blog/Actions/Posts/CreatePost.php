@@ -14,7 +14,7 @@ use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 use Blog\UUID\UUID;
 use InvalidArgumentException;
 
-class CreatePost
+class CreatePost implements ActionInterface
 {
     public function __construct(
         private PostsRepositoryInterface $postsRrepository,
