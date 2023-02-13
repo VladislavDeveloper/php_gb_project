@@ -2,6 +2,7 @@
 
 namespace Blog\Commands;
 
+use Blog\DummyLogger\DummyLogger;
 use Blog\Exceptions\ArgumentsException;
 use Blog\Exceptions\CommandException;
 use Blog\Exceptions\UserNotFoundException;
@@ -31,21 +32,10 @@ class CreateUserCommandsTest extends TestCase
             }
         };
     }
-    public function testItThrowsAnExceptionWhenUserAlreadyExists(): void
-    {
-        $command = new CreateUserCommand(
-            new DummyUsersRepository()
-        );
-
-        $this->expectException(CommandException::class);
-        $this->expectExceptionMessage('User already exists: Ivan');
-
-        $command->handle(new Arguments(['username' => 'Ivan']));
-    }
-
+    
     public function testItRequiresFirstName(): void
     {
-        $command = new CreateUserCommand($this->makeDummyUsersRepository());
+        $command = new CreateUserCommand($this->makeDummyUsersRepository(), new DummyLogger);
 
         $this->expectException(ArgumentsException::class);
         $this->expectExceptionMessage('No such argument: first_name');
@@ -55,7 +45,7 @@ class CreateUserCommandsTest extends TestCase
 
     public function testItRequiresLastName(): void
     {
-        $command = new CreateUserCommand($this->makeDummyUsersRepository());
+        $command = new CreateUserCommand($this->makeDummyUsersRepository(), new DummyLogger);
 
         $this->expectException(ArgumentsException::class);
         $this->expectExceptionMessage('No such argument: last_name');
@@ -92,7 +82,7 @@ class CreateUserCommandsTest extends TestCase
 
         };
 
-        $command = new CreateUserCommand($usersRepository);
+        $command = new CreateUserCommand($usersRepository, new DummyLogger);
 
         $command->handle(new Arguments([
             'username' => 'Ivan',

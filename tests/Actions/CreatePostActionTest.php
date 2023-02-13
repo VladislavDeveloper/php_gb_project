@@ -11,6 +11,7 @@ use Blog\Repositories\PostsRepositories\PostsRepositoryInterface;
 use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 use Blog\User\User;
 use Blog\UUID\UUID;
+use Blog\DummyLogger\DummyLogger;
 use Person\Name;
 use PHPUnit\Framework\TestCase;
 
@@ -92,7 +93,7 @@ class CreatePostTestTest extends TestCase
             )
         ]);
 
-        $action = new CreatePost($postsRepository, $usersRepository);
+        $action = new CreatePost($postsRepository, $usersRepository, new DummyLogger);
 
         $response = $action->handle($request);
 
@@ -128,7 +129,7 @@ class CreatePostTestTest extends TestCase
         $postsRepository = $this->postsRepository();
         $usersRepository = $this->usersRepository([]);
 
-        $action = new CreatePost($postsRepository, $usersRepository);
+        $action = new CreatePost($postsRepository, $usersRepository, new DummyLogger);
 
         $response = $action->handle($request);
 
@@ -156,7 +157,7 @@ class CreatePostTestTest extends TestCase
             )
         ]);
 
-        $action = new CreatePost($postsRepository, $usersRepository);
+        $action = new CreatePost($postsRepository, $usersRepository, new DummyLogger);
 
         $response = $action->handle($request);
 
