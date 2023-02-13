@@ -8,11 +8,13 @@ use Blog\Repositories\UsersRepositories\SqliteUsersRepository;
 use Blog\UUID\UUID;
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 
 class SqlitePostsRepository implements PostsRepositoryInterface
 {
     public function __construct(
-        private PDO $connection
+        private PDO $connection,
+        private LoggerInterface $logger
     )
     {
     }
@@ -23,12 +25,17 @@ class SqlitePostsRepository implements PostsRepositoryInterface
             'INSERT INTO posts (uuid, author_uuid, title, text) VALUES (:uuid, :author_uuid, :title, :text)'
         );
 
+        $postUuid = $post->getUuid();
+
         $statement->execute([
-            ':uuid' => (string) $post->getUuid(),
+            ':uuid' => (string) $postUuid,
             ':author_uuid' => $post->getUser()->uuid(),
             ':title' => $post->getTitle(),
             ':text' => $post->getText(),
         ]);
+
+        //Логируем сообщение о создании поста
+        $this->logger->info("Post saved: $postUuid");
 	}
 	
 	public function get(UUID $uuid): Post 
@@ -49,12 +56,16 @@ class SqlitePostsRepository implements PostsRepositoryInterface
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         if($result === false){
+
+            //Логируем сообщение о том что пост не найден с уровнем warning а затем бросаем исключение
+            $this->logger->warning("Post not found: $uuid");
+
             throw new PostNotFoundException(
                 'Cannot find post: $uuid'
             );
         }
 
-        $userRepository = new SqliteUsersRepository($this->connection);
+        $userRepository = new SqliteUsersRepository($this->connection, $this->logger);
 
         $user = $userRepository->get(new UUID($result['author_uuid']));
 
@@ -78,7 +89,15 @@ class SqlitePostsRepository implements PostsRepositoryInterface
 
         $postsList = $statement->fetchAll();
 
-        $userRepository = new SqliteUsersRepository($this->connection);
+        if(!$postsList){
+            $this->logger->warning("User $author_uuid has no posts yet");
+
+            throw new PostNotFoundException(
+                'Cannot find post: $uuid'
+            );
+        }
+
+        $userRepository = new SqliteUsersRepository($this->connection, $this->logger);
 
         $posts = [];
 
@@ -104,5 +123,7 @@ class SqlitePostsRepository implements PostsRepositoryInterface
         $statement->execute([
             ':uuid' => $uuid
         ]);
+
+        $this->logger->info("Post deleted:  $uuid");
     }
 }

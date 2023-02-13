@@ -2,6 +2,7 @@
 
 namespace BLog\Repositories\CommentsRepositories;
 use Blog\Comment\Comment;
+use Blog\DummyLogger\DummyLogger;
 use Blog\Exceptions\CommentNotFoundException;
 use Blog\Post\Post;
 use Blog\User\User;
@@ -21,7 +22,7 @@ class SqliteCommentsRepositoryTest extends TestCase
         $statementStub->method('fetch')->willReturn(false);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqliteCommentsRepository($connectionStub);
+        $repository = new SqliteCommentsRepository($connectionStub, new DummyLogger);
 
         $this->expectException(CommentNotFoundException::class);
         $this->expectExceptionMessage('Comment not found');
@@ -46,7 +47,7 @@ class SqliteCommentsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $commentRepository = new SqliteCommentsRepository($connectionStub);
+        $commentRepository = new SqliteCommentsRepository($connectionStub,  new DummyLogger);
 
         $user = new User(
             new UUID('6e6b22bc-5ea1-4cda-b7fd-88a55ffc18ee'),
@@ -89,7 +90,7 @@ class SqliteCommentsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $commentsRepository = new SqliteCommentsRepository($connectionStub);
+        $commentsRepository = new SqliteCommentsRepository($connectionStub,  new DummyLogger);
         $comment = $commentsRepository->get(new UUID('72746c50-d2c6-47c3-bd34-6772d8d053da'));
 
         $this->assertSame('72746c50-d2c6-47c3-bd34-6772d8d053da', (string) $comment->getUuid());

@@ -4,6 +4,7 @@ use Blog\Actions\Likes\AddLikeToPost;
 use Blog\Actions\Posts\CreatePost;
 use Blog\Actions\Posts\DropPost;
 use Blog\Actions\Posts\FindByUuid;
+use Blog\Actions\Users\CreateNewUser;
 use Blog\Actions\Users\FindByUsername;
 use Blog\Exceptions\AppException;
 use Blog\Exceptions\HttpException;
@@ -44,6 +45,7 @@ $routes = [
         '/posts/show' => FindByUuid::class,
     ],
     'POST' => [
+        '/user/create' => CreateNewUser::class,
         '/posts/create' => CreatePost::class,
         '/comments/add' => AddComment::class,
         '/posts/like/add' => AddLikeToPost::class

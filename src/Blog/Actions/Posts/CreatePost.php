@@ -27,9 +27,6 @@ class CreatePost implements ActionInterface
 
     public function handle(Request $request): Response
     {
-
-        $this->logger->info("Post create: started");
-
         try{
             $author = $this->identification->user($request);
         }catch(UserNotFoundException $error){
@@ -53,8 +50,6 @@ class CreatePost implements ActionInterface
         }
 
         $this->postsRrepository->save($post);
-
-        $this->logger->info("Post created: $newPostUuid");
 
         return new SuccessfulResponse([
             'uuid' => (string) $newPostUuid
