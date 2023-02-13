@@ -4,6 +4,7 @@ namespace Blog\Actions\Posts;
 use Blog\Actions\ActionInterface;
 use Blog\Exceptions\HttpException;
 use Blog\Exceptions\UserNotFoundException;
+use Blog\Http\Auth\IdentificationInterface;
 use Blog\Http\ErrorResponse;
 use Blog\Http\Request;
 use Blog\Http\Response;
@@ -13,26 +14,26 @@ use Blog\Repositories\PostsRepositories\PostsRepositoryInterface;
 use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 use Blog\UUID\UUID;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 
 class CreatePost implements ActionInterface
 {
     public function __construct(
         private PostsRepositoryInterface $postsRrepository,
-        private UsersRepositoryInterface $usersRrepository,
+        private IdentificationInterface $identification,
+        private LoggerInterface $logger,
     ){
     }
 
     public function handle(Request $request): Response
     {
-        try{
-            $authorUuid = new UUID($request->jsonBodyField('author_uuid'));
-        }catch(HttpException | InvalidArgumentException $error){
-            return new ErrorResponse($error->getMessage());
-        }
+
+        $this->logger->info("Post create: started");
 
         try{
-            $user = $this->usersRrepository->get($authorUuid);
+            $author = $this->identification->user($request);
         }catch(UserNotFoundException $error){
+            $this->logger->warning("Create post: User not found");
             return new ErrorResponse($error->getMessage());
         }
 
@@ -43,7 +44,7 @@ class CreatePost implements ActionInterface
         try{
             $post = new Post(
                 $newPostUuid,
-                $user,
+                $author,
                 $request->jsonBodyField('title'),
                 $request->jsonBodyField('text'),
             );
@@ -52,6 +53,8 @@ class CreatePost implements ActionInterface
         }
 
         $this->postsRrepository->save($post);
+
+        $this->logger->info("Post created: $newPostUuid");
 
         return new SuccessfulResponse([
             'uuid' => (string) $newPostUuid

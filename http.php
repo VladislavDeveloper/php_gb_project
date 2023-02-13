@@ -9,6 +9,7 @@ use Blog\Exceptions\AppException;
 use Blog\Exceptions\HttpException;
 use Blog\Http\ErrorResponse;
 use Blog\Http\Request;
+use Psr\Log\LoggerInterface;
 
 $container = require __DIR__ . '/bootstrap.php';
 
@@ -18,16 +19,21 @@ $request = new Request(
     file_get_contents('php://input'),
 );
 
+//Вытаскиваем объект класса логгер из контейнера
+$logger = $container->get(LoggerInterface::class);
+
 try{
     $path = $request->path();
-}catch(HttpException){
+}catch(HttpException $error){
+    $logger->warning($error->getMessage());
     (new ErrorResponse)->send();
     return;
 }
 
 try{
     $method = $request->method();
-}catch(HttpException){
+}catch(HttpException $error){
+    $logger->warning($error->getMessage());
     (new ErrorResponse)->send();
     return;
 }
@@ -47,23 +53,20 @@ $routes = [
     ]
 ];
 
-if(!array_key_exists($method, $routes)){
-    (new ErrorResponse("Route not found: $method $path"))->send();
-    return;
-}
-
-if(!array_key_exists($path, $routes[$method])){
-    (new ErrorResponse("Route not found: $method $path"))->send();
+if(!array_key_exists($method, $routes) || !array_key_exists($path, $routes[$method])){
+    $message = "Route not found: $method $path";
+    $logger->notice($message);
+    (new ErrorResponse($message))->send();
     return;
 }
 
 $actionName = $routes[$method][$path];
 
-$action = $container->get($actionName);
-
 try{
+    $action = $container->get($actionName);
     $response = $action->handle($request);
 }catch(AppException $error){
+    $logger->error($error->getMessage(), ['exception' => $error]);
     (new ErrorResponse($error->getMessage()))->send();
 }
 

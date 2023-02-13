@@ -2,7 +2,7 @@
 namespace Blog\Container;
 
 use Blog\Container\DIContainer;
-use Blog\Container\NotFoundException;
+use Blog\Exceptions\NotFoundException;
 use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 use Blog\Repositories\UsersRepositories\InMemoryUsersRepository;
 use PHPUnit\Framework\TestCase;
