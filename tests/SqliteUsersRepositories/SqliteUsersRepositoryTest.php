@@ -1,6 +1,7 @@
 <?php
 
 namespace Blog\Repositories\UsersRepositories;
+use Blog\DummyLogger\DummyLogger;
 use Blog\Exceptions\UserNotFoundException;
 use Blog\User\User;
 use Blog\UUID\UUID;
@@ -22,7 +23,7 @@ class SqliteUsersRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqliteUsersRepository($connectionStub);
+        $repository = new SqliteUsersRepository($connectionStub,  new DummyLogger);
 
         $this->expectException(UserNotFoundException::class);
         $this->expectExceptionMessage('Cannot get user: Ivan !');
@@ -49,7 +50,7 @@ class SqliteUsersRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $repository = new SqliteUsersRepository($connectionStub);
+        $repository = new SqliteUsersRepository($connectionStub,  new DummyLogger);
 
         $repository->save(
             new User(
@@ -75,7 +76,7 @@ class SqliteUsersRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $userRepository = new SqliteUsersRepository($connectionStub);
+        $userRepository = new SqliteUsersRepository($connectionStub,  new DummyLogger);
         $user = $userRepository->get(new UUID('123e4567-e89b-12d3-a456-426614174000'));
 
         $this->assertSame('123e4567-e89b-12d3-a456-426614174000', (string) $user->uuid());

@@ -7,11 +7,13 @@ use Blog\UUID\UUID;
 use PDO;
 use PDOStatement;
 use Person\Name;
+use Psr\Log\LoggerInterface;
 
 class SqliteUsersRepository implements UsersRepositoryInterface
 {
     public function __construct(
-        private PDO $connection
+        private PDO $connection,
+        private LoggerInterface $logger
     ){
     }
 
@@ -22,12 +24,17 @@ class SqliteUsersRepository implements UsersRepositoryInterface
             VALUES (:uuid, :username, :first_name, :last_name)'
         );
 
+        $uuid = $user->uuid();
+
         $statement->execute([
-            ':uuid' => (string) $user->uuid(),
+            ':uuid' => (string) $uuid,
             ':username' => $user->getUsername(),
             ':first_name' => $user->Name()->getFirstName(),
             ':last_name' => $user->Name()->getLastName(),
         ]);
+
+        //Логируем сообщении об успешном сохранении пользователя в БД
+        $this->logger->info("User saved: $uuid");
     }
 
     public function get(UUID $uuid): User
@@ -62,6 +69,9 @@ class SqliteUsersRepository implements UsersRepositoryInterface
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         if(false === $result){
+            //Логируем сообщение о том что пользователь не найден с уровнем warning а затем бросаем исключение
+            $this->logger->warning("User not found: $errorString");
+
             throw new UserNotFoundException(
                 "Cannot get user: $errorString !",
             );

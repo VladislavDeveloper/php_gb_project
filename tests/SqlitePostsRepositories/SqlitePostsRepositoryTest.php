@@ -1,6 +1,7 @@
 <?php
 
 namespace Blog\Repositories\PostsRepositories;
+use Blog\DummyLogger\DummyLogger;
 use Blog\Exceptions\PostNotFoundException;
 use Blog\Post\Post;
 use Blog\User\User;
@@ -22,7 +23,7 @@ class SqlitePostsRepositoryTest extends TestCase
         $statementStub->method('fetch')->willReturn(false);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqlitePostsRepository($connectionStub);
+        $repository = new SqlitePostsRepository($connectionStub,  new DummyLogger);
 
         $this->expectException(PostNotFoundException::class);
         $this->expectExceptionMessage('Cannot find post: $uuid');
@@ -49,7 +50,7 @@ class SqlitePostsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $repository = new SqlitePostsRepository($connectionStub);
+        $repository = new SqlitePostsRepository($connectionStub,  new DummyLogger);
 
         $user = new User(
             new UUID('123e4567-e89b-12d3-a456-426614174000'),
@@ -86,7 +87,7 @@ class SqlitePostsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $postRepository = new SqlitePostsRepository($connectionStub);
+        $postRepository = new SqlitePostsRepository($connectionStub,  new DummyLogger);
         $post = $postRepository->get(new UUID('2bfe4536-87bc-406b-b417-07f316a12d5d'));
 
         $this->assertSame('2bfe4536-87bc-406b-b417-07f316a12d5d', (string) $post->getUuid());

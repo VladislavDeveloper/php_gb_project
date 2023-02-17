@@ -3,6 +3,7 @@
 namespace Blog\Actions\Posts;
 use Blog\Exceptions\PostNotFoundException;
 use Blog\Exceptions\UserNotFoundException;
+use Blog\Http\Auth\IdentificationInterface;
 use Blog\Http\ErrorResponse;
 use Blog\Http\Request;
 use Blog\Http\SuccessfulResponse;
@@ -15,7 +16,7 @@ use Blog\DummyLogger\DummyLogger;
 use Person\Name;
 use PHPUnit\Framework\TestCase;
 
-class CreatePostTestTest extends TestCase
+class CreatePostTest extends TestCase
 {
     private function postsRepository(): PostsRepositoryInterface{
         return new class() implements PostsRepositoryInterface{
@@ -74,6 +75,23 @@ class CreatePostTestTest extends TestCase
         };
     }
 
+    private function dummyIdentification($user): IdentificationInterface{
+        return new class($user) implements IdentificationInterface{
+            public function __construct(
+                private $user
+            ){
+            }
+            public function user(Request $request): User
+            {
+                if($this->user){
+                    return $this->user;
+                }
+                throw new UserNotFoundException("Cannot find user");
+                
+            }
+        };
+    }
+
     /**
     * @runInSeparateProcess
     * @preserveGlobalState disabled
@@ -85,15 +103,15 @@ class CreatePostTestTest extends TestCase
 
         $postsRepository = $this->postsRepository();
 
-        $usersRepository = $this->usersRepository([
+        $dummyIdentification = $this->dummyIdentification(
             new User(
                 new UUID('e0f29ef4-39e8-4d4d-b8f2-defd537f5915'),
-                new Name('Ivan', 'Ivanov'),
-                'user123'
+                new Name('Vadim', 'Zorov'),
+                'VadimSam'
             )
-        ]);
+        );
 
-        $action = new CreatePost($postsRepository, $usersRepository, new DummyLogger);
+        $action = new CreatePost($postsRepository, $dummyIdentification, new DummyLogger);
 
         $response = $action->handle($request);
 
@@ -123,18 +141,18 @@ class CreatePostTestTest extends TestCase
     */
     public function testItReturnsErrorResponseIfNotFoundUser(): void
     {
-        $request = new Request([], [], '{"author_uuid":"e0f29ef4-39e8-4d4d-b8f2-defd537f5915",
+        $request = new Request([], [], '{"78249850-675d-4c09-a81c-e3c7a42ccab6",
              "title":"title", "text":"text"}');
 
         $postsRepository = $this->postsRepository();
-        $usersRepository = $this->usersRepository([]);
+        $dummyIdentification = $this->dummyIdentification([]);
 
-        $action = new CreatePost($postsRepository, $usersRepository, new DummyLogger);
+        $action = new CreatePost($postsRepository, $dummyIdentification, new DummyLogger);
 
         $response = $action->handle($request);
 
         $this->assertInstanceOf(ErrorResponse::class, $response);
-        $this->expectOutputString('{"SUCCESS":false,"reason":"Cannot find user: e0f29ef4-39e8-4d4d-b8f2-defd537f5915"}');
+        $this->expectOutputString('{"SUCCESS":false,"reason":"Cannot find user"}');
 
         $response->send();
     }
@@ -149,15 +167,15 @@ class CreatePostTestTest extends TestCase
             "title":"title"}');
 
         $postsRepository = $this->postsRepository();
-        $usersRepository = $this->usersRepository([
+        $dummyIdentification = $this->dummyIdentification(
             new User(
                 new UUID('e0f29ef4-39e8-4d4d-b8f2-defd537f5915'),
-                new Name('Ivan', 'Ivanov'),
-                'user123'
+                new Name('Vadim', 'Zorov'),
+                'VadimSam'
             )
-        ]);
+        );
 
-        $action = new CreatePost($postsRepository, $usersRepository, new DummyLogger);
+        $action = new CreatePost($postsRepository, $dummyIdentification, new DummyLogger);
 
         $response = $action->handle($request);
 

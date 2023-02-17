@@ -7,11 +7,13 @@ use Blog\Exceptions\LikesNotFoundException;
 use Blog\Like\Like;
 use Blog\UUID\UUID;
 use PDO;
+use Psr\Log\LoggerInterface;
 
 class SqliteLikesRepository implements LikesRepositoryInterface
 {
     public function __construct(
-        private PDO $connection
+        private PDO $connection,
+        private LoggerInterface $logger
     ){
     }
 
@@ -22,11 +24,18 @@ class SqliteLikesRepository implements LikesRepositoryInterface
             VALUES (:uuid, :post_uuid, :author_uuid)'
         );
 
+        $likedPost = $like->getPostUuid();
+
+        $likeAuthor = $like->getAuthorUuid();
+
         $statement->execute([
             ':uuid' => (string) $like->getUuid(),
-            ':post_uuid' => (string) $like->getPostUuid(),
-            ':author_uuid' => (string) $like->getAuthorUuid()
+            ':post_uuid' => (string)  $likedPost,
+            ':author_uuid' => (string) $likeAuthor
         ]);
+
+        //Логируем сообщение о том, что такой-то пост лайкнул такой-то пользователь
+        $this->logger->info("Post $likedPost liked by user  $likeAuthor");
     }
 
     public function getByPostUuid(UUID $post_uuid): array
@@ -42,6 +51,8 @@ class SqliteLikesRepository implements LikesRepositoryInterface
         $likesList = $statement->fetchAll();
 
         if(!$likesList){
+            $this->logger->warning("No likes to post: $post_uuid");
+
             throw new LikesNotFoundException('No likes to post');
         }
 
@@ -73,6 +84,8 @@ class SqliteLikesRepository implements LikesRepositoryInterface
         $existed = $statement->fetch();
 
         if($existed){
+            $this->logger->warning("This user already liked this post: $post_uuid");
+            
             throw new AlreadyLikedException('This user already liked this post');
         }
     }
