@@ -1,8 +1,15 @@
 <?php
 use Blog\Container\DIContainer;
+use Blog\Http\Auth\AuthenticationInterface;
+use Blog\Http\Auth\BearerTokenAuthentication;
 use Blog\Http\Auth\IdentificationInterface;
 use Blog\Http\Auth\JsonBodyUsernameIdentification;
 use Blog\Http\Auth\JsonBodyUuidIdentification;
+use Blog\Http\Auth\PasswordAuthentication;
+use Blog\Http\Auth\PasswordAuthenticationInterface;
+use Blog\Http\Auth\TokenAuthenticationInterface;
+use Blog\Repositories\AuthTokensRepository\AuthTokensRepositoryInterface;
+use Blog\Repositories\AuthTokensRepository\SqliteAuthTokensRepository;
 use Blog\Repositories\CommentsRepositories\CommentsRepositoryInterface;
 use Blog\Repositories\CommentsRepositories\SqliteCommentsRepository;
 use Blog\Repositories\LikesRepository\LikesRepositoryInterface;
@@ -58,10 +65,21 @@ $container->bind(
     SqliteLikesRepository::class
 );
 
-//Подключаем контракт с реализации идентификации в контейнер
+//Подключаем контракт с реализации аутентификации по паролю
 $container->bind(
-    IdentificationInterface::class,
-    JsonBodyUsernameIdentification::class
+    PasswordAuthenticationInterface::class,
+    PasswordAuthentication::class
+);
+
+//Подключаем контракт с реализации аутентификации по токену
+$container->bind(
+    TokenAuthenticationInterface::class,
+    BearerTokenAuthentication::class
+);
+
+$container->bind(
+    AuthTokensRepositoryInterface::class,
+    SqliteAuthTokensRepository::class
 );
 
 //Подключаем логгер в контейнер зависимостей приложения

@@ -9,7 +9,7 @@ use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 use Blog\User\User;
 use Blog\UUID\UUID;
 
-class JsonBodyUuidIdentification implements IdentificationInterface
+class JsonBodyUuidIdentification implements AuthenticationInterface
 {
     public function __construct(
         private UsersRepositoryInterface $usersRepository

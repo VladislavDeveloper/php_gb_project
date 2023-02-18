@@ -4,7 +4,10 @@ namespace Blog\Actions\Posts;
 use Blog\Actions\ActionInterface;
 use Blog\Exceptions\HttpException;
 use Blog\Exceptions\UserNotFoundException;
+use Blog\Http\Auth\AuthenticationInterface;
 use Blog\Http\Auth\IdentificationInterface;
+use Blog\Http\Auth\TokenAuthenticationInteface;
+use Blog\Http\Auth\TokenAuthenticationInterface;
 use Blog\Http\ErrorResponse;
 use Blog\Http\Request;
 use Blog\Http\Response;
@@ -20,7 +23,7 @@ class CreatePost implements ActionInterface
 {
     public function __construct(
         private PostsRepositoryInterface $postsRrepository,
-        private IdentificationInterface $identification,
+        private TokenAuthenticationInterface $authentication,
         private LoggerInterface $logger,
     ){
     }
@@ -28,7 +31,7 @@ class CreatePost implements ActionInterface
     public function handle(Request $request): Response
     {
         try{
-            $author = $this->identification->user($request);
+            $author = $this->authentication->user($request);
         }catch(UserNotFoundException $error){
             $this->logger->warning("Create post: User not found");
             return new ErrorResponse($error->getMessage());

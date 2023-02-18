@@ -46,6 +46,7 @@ class SqliteUsersRepositoryTest extends TestCase
                 ':username' => 'ivan123',
                 ':first_name' => 'Ivan',
                 ':last_name' => 'Ivanov',
+                ':password' => 'qwerty'
             ]);
 
         $connectionStub->method('prepare')->willReturn($statementMock);
@@ -56,7 +57,8 @@ class SqliteUsersRepositoryTest extends TestCase
             new User(
                 new UUID(('123e4567-e89b-12d3-a456-426614174000')),
                 new Name('Ivan', 'Ivanov'),
-                'ivan123'
+                'ivan123',
+                'qwerty'
             )
         );
     }
@@ -72,6 +74,7 @@ class SqliteUsersRepositoryTest extends TestCase
             'first_name' => 'Ivan',
             'last_name' => 'Ivanov',
             'username' => '123ivan',
+            'password' => 'qwerty',
         ]);
 
         $connectionStub->method('prepare')->willReturn($statementMock);

@@ -9,7 +9,7 @@ use Blog\Http\Request;
 use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 use Blog\User\User;
 
-class JsonBodyUsernameIdentification implements IdentificationInterface
+class JsonBodyUsernameIdentification implements AuthenticationInterface
 {
     public function __construct(
         private UsersRepositoryInterface $usersRepository
