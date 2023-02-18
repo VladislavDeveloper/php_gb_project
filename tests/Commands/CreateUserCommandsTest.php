@@ -11,6 +11,7 @@ use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 use Blog\User\User;
 use Blog\UUID\UUID;
 use PHPUnit\Framework\TestCase;
+use SebastianBergmann\Type\VoidType;
 
 class CreateUserCommandsTest extends TestCase
 {
@@ -92,5 +93,25 @@ class CreateUserCommandsTest extends TestCase
 
         
         $this->assertTrue($usersRepository->wasCalled());
+    }
+
+    //Проверка запроса пароля
+    public function testItRequiersPassword(): void
+    {
+        $command = new CreateUserCommand(
+            $this->makeDummyUsersRepository(),
+            new DummyLogger()
+        );
+
+        $this->expectException(ArgumentsException::class);
+        $this->expectExceptionMessage('No such argument: password');
+
+        $command->handle(
+            new Arguments([
+                'username' => 'Vasija',
+                'first_name' => 'Vasija',
+                'last_name' => 'Ivanov'
+            ])
+        );
     }
 }

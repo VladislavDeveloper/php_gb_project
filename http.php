@@ -1,4 +1,5 @@
 <?php
+use Blog\Actions\Auth\LogIn;
 use Blog\Actions\Comments\AddComment;
 use Blog\Actions\Likes\AddLikeToPost;
 use Blog\Actions\Posts\CreatePost;
@@ -45,6 +46,7 @@ $routes = [
         '/posts/show' => FindByUuid::class,
     ],
     'POST' => [
+        '/login' => LogIn::class,
         '/user/create' => CreateNewUser::class,
         '/posts/create' => CreatePost::class,
         '/comments/add' => AddComment::class,
