@@ -1,5 +1,6 @@
 <?php
 use Blog\Actions\Auth\LogIn;
+use Blog\Actions\Auth\LogOut;
 use Blog\Actions\Comments\AddComment;
 use Blog\Actions\Likes\AddLikeToPost;
 use Blog\Actions\Posts\CreatePost;
@@ -47,6 +48,7 @@ $routes = [
     ],
     'POST' => [
         '/login' => LogIn::class,
+        '/logout' => LogOut::class,
         '/user/create' => CreateNewUser::class,
         '/posts/create' => CreatePost::class,
         '/comments/add' => AddComment::class,

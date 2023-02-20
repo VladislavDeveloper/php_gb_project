@@ -22,13 +22,14 @@ class LogIn implements ActionInterface
 
     public function handle(Request $request): Response
     {
+        //Проверяем аутентификацию по паролю
         try{
             $user = $this->passwordAuthentication->user($request);
         }catch(AuthException $error){
             return new ErrorResponse($error->getMessage());
         }
 
-        //Генерация токена
+        //Генерируем токен
         $authToken = new AuthToken(
             //Генерируем случайную строку в 40 символов
             bin2hex(random_bytes(40)),
@@ -36,10 +37,15 @@ class LogIn implements ActionInterface
             (new DateTimeImmutable())->modify('+1 day')
         );
 
+        //Сохраняем токен в БД
         $this->authTokensRepository->save($authToken);
 
+        //Возвращаем успешный ответ
         return new SuccessfulResponse([
             'token' => (string)$authToken->token()
         ]);
     }
 }
+
+
+

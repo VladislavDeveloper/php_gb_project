@@ -30,6 +30,7 @@ class CreatePost implements ActionInterface
 
     public function handle(Request $request): Response
     {
+        // Проверяем авторизацию пользователя по токену и получаем объект юзера
         try{
             $author = $this->authentication->user($request);
         }catch(UserNotFoundException $error){
@@ -38,9 +39,9 @@ class CreatePost implements ActionInterface
         }
 
         //Генерируем uuid
-
         $newPostUuid = UUID::random();
 
+        //Создаем объект поста
         try{
             $post = new Post(
                 $newPostUuid,
@@ -52,8 +53,10 @@ class CreatePost implements ActionInterface
             return new ErrorResponse($error->getMessage());
         }
 
+        //Сохраняем пост в БД
         $this->postsRrepository->save($post);
 
+        //Возвращаем успешный ответ
         return new SuccessfulResponse([
             'uuid' => (string) $newPostUuid
         ]);

@@ -41,7 +41,7 @@ class CreateUserCommandsTest extends TestCase
         $this->expectException(ArgumentsException::class);
         $this->expectExceptionMessage('No such argument: first_name');
 
-        $command->handle(new Arguments(['username' => 'Ivan']));
+        $command->handle(new Arguments(['username' => 'Ivan', 'password' => 'qwerty']));
     }
 
     public function testItRequiresLastName(): void
@@ -54,6 +54,7 @@ class CreateUserCommandsTest extends TestCase
         $command->handle(new Arguments([
             'username' => 'Ivan',
             'first_name' => 'Ivan',
+            'password' => 'qwerty'
         ]));
     }
 
@@ -89,6 +90,7 @@ class CreateUserCommandsTest extends TestCase
             'username' => 'Ivan',
             'first_name' => 'Ivan',
             'last_name' => 'Nikitin',
+            'password' => 'qwerty'
         ]));
 
         
