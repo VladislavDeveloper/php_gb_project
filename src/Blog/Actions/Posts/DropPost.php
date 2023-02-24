@@ -52,7 +52,7 @@ class DropPost implements ActionInterface
         }
 
         //Удаляем пост
-        $this->postsRepository->deletePost($uuid);
+        $this->postsRepository->delete($uuid);
 
         return new SuccessfulResponse([
             'message' => "Post: $uuid deleted"

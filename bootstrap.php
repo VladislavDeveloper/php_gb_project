@@ -22,6 +22,11 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Dotenv\Dotenv;
+use Faker\Provider\Lorem;
+use Faker\Provider\ru_RU\Internet;
+use Faker\Provider\ru_RU\Person;
+use Faker\Provider\ru_RU\Text;
+
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -30,6 +35,18 @@ Dotenv::createImmutable(__DIR__)->safeLoad();
 
 //Создаем экземпляр контейнера
 $container = new DIContainer();
+
+//Создаём объект генератора тестовых данных
+
+$faker = new Faker\Generator();
+
+//Инициализируем необъодимые данные
+
+$faker->addProvider(new Person($faker));
+$faker->addProvider(new Text($faker));
+$faker->addProvider(new Internet($faker));
+$faker->addProvider(new Lorem($faker));
+
 
 //Подключение к БД
 
@@ -80,6 +97,12 @@ $container->bind(
 $container->bind(
     AuthTokensRepositoryInterface::class,
     SqliteAuthTokensRepository::class
+);
+
+//Добавляем генератор в контейнер внедрения зависимостей
+$container->bind(
+    \Faker\Generator::class,
+    $faker
 );
 
 //Подключаем логгер в контейнер зависимостей приложения

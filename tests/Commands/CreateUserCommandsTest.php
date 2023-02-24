@@ -2,6 +2,7 @@
 
 namespace Blog\Commands;
 
+use Blog\Commands\Users\CreateUser;
 use Blog\DummyLogger\DummyLogger;
 use Blog\Exceptions\ArgumentsException;
 use Blog\Exceptions\CommandException;
@@ -11,7 +12,10 @@ use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 use Blog\User\User;
 use Blog\UUID\UUID;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use SebastianBergmann\Type\VoidType;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 
 class CreateUserCommandsTest extends TestCase
 {
@@ -34,31 +38,67 @@ class CreateUserCommandsTest extends TestCase
         };
     }
     
-    public function testItRequiresFirstName(): void
+
+    //Проверка запроса пароля
+    public function testItRequiersPassword(): void
     {
-        $command = new CreateUserCommand($this->makeDummyUsersRepository(), new DummyLogger);
+        $command = new CreateUser(
+            $this->makeDummyUsersRepository()
+        );
 
-        $this->expectException(ArgumentsException::class);
-        $this->expectExceptionMessage('No such argument: first_name');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Not enough arguments (missing: "first_name, last_name, password"');
 
-        $command->handle(new Arguments(['username' => 'Ivan', 'password' => 'qwerty']));
+        $command->run(
+            new ArrayInput([
+                'username' => 'Ivan',
+            ]),
+            new NullOutput()
+        );
+            
     }
 
     public function testItRequiresLastName(): void
     {
-        $command = new CreateUserCommand($this->makeDummyUsersRepository(), new DummyLogger);
+        $command = new CreateUser(
+            $this->makeDummyUsersRepository(),
+        );
 
-        $this->expectException(ArgumentsException::class);
-        $this->expectExceptionMessage('No such argument: last_name');
+        $this->expectException(RuntimeException::class);
 
-        $command->handle(new Arguments([
-            'username' => 'Ivan',
-            'first_name' => 'Ivan',
-            'password' => 'qwerty'
-        ]));
+        $this->expectExceptionMessage('Not enough arguments (missing: "first_name, last_name").');
+
+        $command->run(
+            new ArrayInput([
+                'username' => 'Ivan',
+                'password' => 'qwerty',
+                'first_name'
+            ]),
+            //Передаём также объект, реализующий контракт OutputInterface
+            new NullOutput()
+        );
     }
 
-    //Тест проверяет, что команла сохраняет пользователя в репозитории
+    public function testItRequiresFirstName(): void
+    {
+        $command = new CreateUser(
+            $this->makeDummyUsersRepository()
+        );
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Not enough arguments (missing: "first_name, last_name").');
+
+        $command->run(
+            new ArrayInput([
+                'username' => 'Ivan',
+                'password' => 'some_password',
+            ]),
+            new NullOutput()
+        );
+            
+    }
+
+    //Тест проверяет, что команла сохраняет пользователя в репозитори
     public function testItSavesUserToRepository(): void
     {
         $usersRepository = new class implements UsersRepositoryInterface{
@@ -84,36 +124,19 @@ class CreateUserCommandsTest extends TestCase
 
         };
 
-        $command = new CreateUserCommand($usersRepository, new DummyLogger);
+        $command = new CreateUser($usersRepository);
 
-        $command->handle(new Arguments([
-            'username' => 'Ivan',
-            'first_name' => 'Ivan',
-            'last_name' => 'Nikitin',
-            'password' => 'qwerty'
-        ]));
+        $command->run(
+            new ArrayInput([
+                'username' => 'Ivan',
+                'password' => 'some_password',
+                'first_name' => 'Ivan',
+                'last_name' => 'Nikitin',
+            ]),
+            new NullOutput()
+        );
 
         
         $this->assertTrue($usersRepository->wasCalled());
-    }
-
-    //Проверка запроса пароля
-    public function testItRequiersPassword(): void
-    {
-        $command = new CreateUserCommand(
-            $this->makeDummyUsersRepository(),
-            new DummyLogger()
-        );
-
-        $this->expectException(ArgumentsException::class);
-        $this->expectExceptionMessage('No such argument: password');
-
-        $command->handle(
-            new Arguments([
-                'username' => 'Vasija',
-                'first_name' => 'Vasija',
-                'last_name' => 'Ivanov'
-            ])
-        );
     }
 }
