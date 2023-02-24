@@ -5,13 +5,13 @@ use Blog\Actions\ActionInterface;
 use Blog\Exceptions\HttpException;
 use Blog\Exceptions\PostNotFoundException;
 use Blog\Exceptions\UserNotFoundException;
+use Blog\Http\Auth\TokenAuthenticationInterface;
 use Blog\Http\ErrorResponse;
 use Blog\Http\Request;
 use Blog\Http\Response;
 use Blog\Http\SuccessfulResponse;
 use Blog\Repositories\CommentsRepositories\CommentsRepositoryInterface;
 use Blog\Repositories\PostsRepositories\PostsRepositoryInterface;
-use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 use Blog\UUID\UUID;
 use InvalidArgumentException;
 
@@ -20,23 +20,30 @@ class AddComment implements ActionInterface
     public function __construct(
         private CommentsRepositoryInterface $commentsRepository,
         private PostsRepositoryInterface $postsRepository,
-        private UsersRepositoryInterface $usersRepository
+        private TokenAuthenticationInterface $authentication
     ){
     }
 
     public function handle(Request $request): Response
     {
+        //Проверяем авторизацию пользователя по токену
         try{
-            $postUuid = new UUID($request->jsonBodyField('post_uuid'));
-            $authorUuid = new UUID($request->jsonBodyField('author_uuid'));
-        }catch(HttpException | InvalidArgumentException $error){
+            $user = $this->authentication->user($request);
+        }catch(HttpException $error){
             return new ErrorResponse($error->getMessage());
         }
 
+        // Получаем post_uuid из запроса 
+        try{
+            $postUuid = new UUID($request->jsonBodyField('post_uuid'));
+        }catch(InvalidArgumentException $error){
+            return new ErrorResponse($error->getMessage());
+        }
+
+        //Получаем посто по post_uuid
         try{
             $post = $this->postsRepository->get($postUuid);
-            $user = $this->usersRepository->get($authorUuid);
-        }catch(UserNotFoundException | PostNotFoundException $error){
+        }catch(PostNotFoundException $error){
             return new ErrorResponse($error->getMessage());
         }
 
@@ -53,6 +60,7 @@ class AddComment implements ActionInterface
             return new ErrorResponse($error->getMessage());
         }
 
+        //Сохраняем комментарий в БД
         $this->commentsRepository->save($comment);
 
         return new SuccessfulResponse([

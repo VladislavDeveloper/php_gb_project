@@ -22,19 +22,7 @@ class BearerTokenAuthentication implements TokenAuthenticationInterface
 
     public function user(Request $request): User
     {
-        try{
-            $header = $request->header('Authorization');
-        }catch(HttpException $error){
-            throw new AuthException($error->getMessage());
-        }
-
-        //Проверяем формат заголовка
-        if(!str_starts_with($header, self::HEADER_PREFIX)){
-            throw new AuthException("Malformed token: [$header]");
-        }
-
-        //Убираем префикс
-        $token = mb_substr($header, strlen(self::HEADER_PREFIX));
+        $token = $this->getToken($request);
 
         try{
             $authToken = $this->authTokensRepository->get($token);
@@ -50,6 +38,24 @@ class BearerTokenAuthentication implements TokenAuthenticationInterface
         $userUuid = $authToken->userUuid();
 
         return $this->usersRepository->get($userUuid);
+
+    }
+
+    public function getToken(Request $request): string
+    {
+        try{
+            $header = $request->header('Authorization');
+        }catch(HttpException $error){
+            throw new AuthException($error->getMessage());
+        }
+
+        //Проверяем формат заголовка
+        if(!str_starts_with($header, self::HEADER_PREFIX)){
+            throw new AuthException("Malformed token: [$header]");
+        }
+
+        //Убираем префикс
+        return mb_substr($header, strlen(self::HEADER_PREFIX));
 
     }
 }

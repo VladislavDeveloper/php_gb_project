@@ -9,40 +9,49 @@ use Blog\Http\Response;
 use Blog\Http\SuccessfulResponse;
 use Blog\Repositories\UsersRepositories\UsersRepositoryInterface;
 use Blog\User\User;
-use Blog\UUID\UUID;
 use Person\Name;
+
 
 class CreateNewUser implements ActionInterface
 {
     public function __construct(
-        private UsersRepositoryInterface $usersRepository
+        private UsersRepositoryInterface $usersRepository,
     ){
     }
 
     public function handle(Request $request): Response
     {
+
+        //Получаем данные для регистрации нового пользователя из тела запроса
         try {
             $username = $request->jsonBodyField('username');
             $firstName = $request->jsonBodyField('first_name');
             $lastName = $request->jsonBodyField('last_name');
+            $password = $request->jsonBodyField('password');
         } catch (HttpException $error) {
             return new ErrorResponse($error->getMessage());
         }
 
+        //Создаем объект пользователя
+        $user = User::createFrom(
+            $username,
+            new Name(
+                $firstName,
+                $lastName
+            ),
+            $password
+        );
+
+        //Сохраняем пользователя в БД
         try{
-            $user = new User(
-                $uuid = new UUID(UUID::random()),
-                new Name($firstName, $lastName),
-                $username
-            );
+            $this->usersRepository->save($user);
         }catch(HttpException $error){
             return new ErrorResponse($error->getMessage());
         }
-
-        $this->usersRepository->save($user);
-
+        
+        //Возвращаем успешный ответ
         return new SuccessfulResponse([
-            'uuid' => (string) $uuid
+            'uuid' => (string) $user->uuid()
         ]);
 
     }

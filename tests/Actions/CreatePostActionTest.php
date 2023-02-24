@@ -3,7 +3,9 @@
 namespace Blog\Actions\Posts;
 use Blog\Exceptions\PostNotFoundException;
 use Blog\Exceptions\UserNotFoundException;
+use Blog\Http\Auth\AuthenticationInterface;
 use Blog\Http\Auth\IdentificationInterface;
+use Blog\Http\Auth\TokenAuthenticationInterface;
 use Blog\Http\ErrorResponse;
 use Blog\Http\Request;
 use Blog\Http\SuccessfulResponse;
@@ -75,8 +77,8 @@ class CreatePostTest extends TestCase
         };
     }
 
-    private function dummyIdentification($user): IdentificationInterface{
-        return new class($user) implements IdentificationInterface{
+    private function dummyIdentification($user): TokenAuthenticationInterface{
+        return new class($user) implements TokenAuthenticationInterface{
             public function __construct(
                 private $user
             ){
@@ -107,7 +109,8 @@ class CreatePostTest extends TestCase
             new User(
                 new UUID('e0f29ef4-39e8-4d4d-b8f2-defd537f5915'),
                 new Name('Vadim', 'Zorov'),
-                'VadimSam'
+                'VadimSam',
+                'qwerty'
             )
         );
 
@@ -171,7 +174,8 @@ class CreatePostTest extends TestCase
             new User(
                 new UUID('e0f29ef4-39e8-4d4d-b8f2-defd537f5915'),
                 new Name('Vadim', 'Zorov'),
-                'VadimSam'
+                'VadimSam',
+                'qwerty'
             )
         );
 
