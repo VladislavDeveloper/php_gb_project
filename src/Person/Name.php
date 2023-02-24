@@ -7,48 +7,29 @@ class Name
         private string $lastName
     ) {
     }
+
     public function __toString()
     {
         return 'Имя: ' . $this->firstName . ' Фамилия: ' . $this->lastName;
     }
 
-        /**
-         * Get the value of firstName
-         */ 
-        public function getFirstName()
-        {
-                return $this->firstName;
-        }
+    public function first(): string
+    {
+        return $this->firstName;
+    }
+    public function setFirstName(string $firstName): void
+    {
+        $this->firstName = $firstName;
+    }
 
-        /**
-         * Set the value of firstName
-         *
-         * @return  self
-         */ 
-        public function setFirstName($firstName)
-        {
-                $this->firstName = $firstName;
+    public function last(): string
+    {
+        return $this->lastName;
+    }
 
-                return $this;
-        }
+    public function setLastName(string $lastName): void
+    {
+        $this->lastName = $lastName;
+    }
 
-        /**
-         * Get the value of lastName
-         */ 
-        public function getLastName()
-        {
-                return $this->lastName;
-        }
-
-        /**
-         * Set the value of lastName
-         *
-         * @return  self
-         */ 
-        public function setLastName($lastName)
-        {
-                $this->lastName = $lastName;
-
-                return $this;
-        }
 }

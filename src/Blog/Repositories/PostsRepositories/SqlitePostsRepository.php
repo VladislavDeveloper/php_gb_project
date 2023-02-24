@@ -114,7 +114,7 @@ class SqlitePostsRepository implements PostsRepositoryInterface
     }
 
     //Метод для удаления статьи по ее uuid
-    public function deletePost(UUID $uuid): void
+    public function delete(UUID $uuid): void
     {
         $statement = $this->connection->prepare(
             'DELETE FROM posts WHERE uuid = :uuid'
