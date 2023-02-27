@@ -40,7 +40,7 @@ class UpdateUser extends Command
                 // Описание
                 'First name',
             )
-                ->addOption(
+            ->addOption(
                 'last-name',
                 'l',
                 InputOption::VALUE_OPTIONAL,

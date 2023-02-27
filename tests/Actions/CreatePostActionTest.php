@@ -37,7 +37,7 @@ class CreatePostTest extends TestCase
                 throw new PostNotFoundException('Not Found');
             }
 
-            public function deletePost(UUID $uuid): void
+            public function delete(UUID $uuid): void
             {
             }
 
